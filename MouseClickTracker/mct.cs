@@ -10,6 +10,9 @@ namespace MouseClickTracker
 {
     public partial class mct: Form
     {
+
+
+        // Variables to interact with the Win32 API
         private IntPtr _hookID = IntPtr.Zero;
         private LowLevelMouseProc _proc;
         private string logFilePath = "MouseClickLog.txt";
@@ -33,14 +36,11 @@ namespace MouseClickTracker
         private const int WM_LBUTTONDOWN = 0x0201;
         private const int WM_RBUTTONDOWN = 0x0204;
 
-
-
-
-
-
+        // Click and Heatmap storage
 
         private List<Point> clickPoints = new List<Point>();
         private Dictionary<Point, int> heatmapData = new Dictionary<Point, int>();
+
 
 
 
@@ -114,6 +114,32 @@ namespace MouseClickTracker
         }
 
 
+        [DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out POINT lpPoint);
+
+        private struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            UnhookWindowsHookEx(_hookID);
+            base.OnFormClosing(e);
+        }
+
+        private bool isTracking = true;
+
+
+
+
+
+
+
+
+
+
 
 
         private void DrawHeatmap()
@@ -136,20 +162,19 @@ namespace MouseClickTracker
                 }
             }
 
-            // Resize to PictureBox
             pictureBoxHeatmap.Image = new Bitmap(bmp, pictureBoxHeatmap.Width, pictureBoxHeatmap.Height);
         }
 
-        // Method to draw a soft gradient instead of a hard circle
+
         private void DrawBlurredCircle(Graphics g, int x, int y, int intensity)
         {
-            int maxSize = 50; // Maximum blur radius
-            float alphaStep = 255f / maxSize; // Smooth transparency
+            int maxSize = 50; // Max blur radius
+            float alphaStep = 255f / maxSize;
 
-            for (int i = maxSize; i > 0; i -= 5) // Layered circles for smooth effect
+            for (int i = maxSize; i > 0; i -= 5)
             {
-                int alpha = (int)(alphaStep * i * (intensity / 2.0)); // Adjust transparency based on intensity
-                alpha = Math.Min(255, alpha); // Cap at 255
+                int alpha = (int)(alphaStep * i * (intensity / 2.0));
+                alpha = Math.Min(255, alpha);
 
                 using (SolidBrush brush = new SolidBrush(Color.FromArgb(alpha, GetHeatmapColor(intensity))))
                 {
@@ -158,16 +183,14 @@ namespace MouseClickTracker
             }
         }
 
-
-        // Generate a heatmap color based on intensity
         private Color GetHeatmapColor(int intensity)
         {
-            int maxIntensity = 20; // Adjust based on how many clicks you expect
+            int maxIntensity = 20;
             double ratio = Math.Min(1, intensity / (double)maxIntensity);
 
-            int r = (int)(Math.Max(0, 255 * (ratio - 0.5) * 2)); // Red starts appearing at higher intensities
-            int g = (int)(Math.Min(255, 255 * (1 - Math.Abs(ratio - 0.5) * 2))); // Green peaks at medium intensity
-            int b = (int)(Math.Max(0, 255 * (0.5 - ratio) * 2)); // Blue for low intensity
+            int r = (int)(Math.Max(0, 255 * (ratio - 0.5) * 2));
+            int g = (int)(Math.Min(255, 255 * (1 - Math.Abs(ratio - 0.5) * 2)));
+            int b = (int)(Math.Max(0, 255 * (0.5 - ratio) * 2));
 
             return Color.FromArgb(r, g, b);
         }
@@ -175,26 +198,6 @@ namespace MouseClickTracker
 
 
 
-
-
-
-
-        [DllImport("user32.dll")]
-        private static extern bool GetCursorPos(out POINT lpPoint);
-
-        private struct POINT
-        {
-            public int X;
-            public int Y;
-        }
-
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            UnhookWindowsHookEx(_hookID);
-            base.OnFormClosing(e);
-        }
-
-        private bool isTracking = true;
 
         private void BtnToggle_Click(object sender, EventArgs e)
         {
@@ -213,17 +216,7 @@ namespace MouseClickTracker
             isTracking = !isTracking;
         }
 
-        private void LoadLog()
-        {
-            if (File.Exists(logFilePath))
-            {
-                lstLog.Items.Clear();
-                foreach (string line in File.ReadAllLines(logFilePath))
-                {
-                    lstLog.Items.Add(line);
-                }
-            }
-        }
+
 
         private void btnSaveHeatmap_Click(object sender, EventArgs e)
         {
