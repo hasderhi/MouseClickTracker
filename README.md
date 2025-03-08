@@ -8,7 +8,7 @@ heatmap. The heatmap can be saved as an image file.
 
 ![The GUI of the MouseClickTracker](img1.png)
 
-You can download the source code or the latest release from [here](https://github.com/hasderhi/MouseClickTracker).
+You can download the source code or the latest release from [here](https://github.com/hasderhi/MouseClickTracker/releases).
 Released under the MIT License. See the LICENSE file for details.
 
 # tk_dev - Software with passion!
