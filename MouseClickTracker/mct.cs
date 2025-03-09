@@ -52,6 +52,11 @@ namespace MouseClickTracker
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Timer backgroundUpdateTimer = new Timer();
+            backgroundUpdateTimer.Interval = 1000; // 1s (to avoid lag)
+            backgroundUpdateTimer.Tick += (s, es) => DrawHeatmap();
+            backgroundUpdateTimer.Start();
+
             _proc = HookCallback;
             _hookID = SetHook(_proc);
 
@@ -74,7 +79,7 @@ namespace MouseClickTracker
                             heatmapData[pt] = 1;
                     }
                 }
-                DrawHeatmap(); // Load heatmap from previous clicks
+                DrawHeatmap(); // Load heatmap
             }
         }
 
@@ -107,7 +112,7 @@ namespace MouseClickTracker
                 {
                     lstLog.Items.Add($"{DateTime.Now}: Click at X:{pt.X}, Y:{pt.Y}");
                     lstLog.TopIndex = lstLog.Items.Count - 1;
-                    DrawHeatmap(); // Update heatmap on each click
+                    DrawHeatmap(); // Update heatmap
                 }));
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
@@ -146,24 +151,37 @@ namespace MouseClickTracker
         {
             if (heatmapData.Count == 0) return;
 
-            int width = Screen.PrimaryScreen.Bounds.Width;
-            int height = Screen.PrimaryScreen.Bounds.Height;
-            Bitmap bmp = new Bitmap(width, height);
-            using (Graphics g = Graphics.FromImage(bmp))
-            {
-                g.Clear(Color.Black); // Background
+            Bitmap baseImage;
 
+            if (chkShowBackground.Checked)
+            {
+                baseImage = CaptureDarkenedScreenshot(); // Use screen capture
+            }
+            else
+            {
+                int width = Screen.PrimaryScreen.Bounds.Width;
+                int height = Screen.PrimaryScreen.Bounds.Height;
+                baseImage = new Bitmap(width, height);
+                using (Graphics g = Graphics.FromImage(baseImage))
+                {
+                    g.Clear(Color.Black); // Use black background
+                }
+            }
+
+            using (Graphics g = Graphics.FromImage(baseImage))
+            {
                 foreach (var entry in heatmapData)
                 {
                     Point pt = entry.Key;
                     int intensity = entry.Value;
-
                     DrawBlurredCircle(g, pt.X, pt.Y, intensity);
                 }
             }
 
-            pictureBoxHeatmap.Image = new Bitmap(bmp, pictureBoxHeatmap.Width, pictureBoxHeatmap.Height);
+            pictureBoxHeatmap.Image = new Bitmap(baseImage, pictureBoxHeatmap.Width, pictureBoxHeatmap.Height);
         }
+
+
 
 
         private void DrawBlurredCircle(Graphics g, int x, int y, int intensity)
@@ -194,6 +212,34 @@ namespace MouseClickTracker
 
             return Color.FromArgb(r, g, b);
         }
+
+
+
+
+
+        private Bitmap CaptureDarkenedScreenshot()
+        {
+            int width = Screen.PrimaryScreen.Bounds.Width;
+            int height = Screen.PrimaryScreen.Bounds.Height;
+            Bitmap screenshot = new Bitmap(width, height);
+
+            using (Graphics g = Graphics.FromImage(screenshot))
+            {
+                g.CopyFromScreen(0, 0, 0, 0, new Size(width, height));
+
+                // darkening
+                using (SolidBrush darkenBrush = new SolidBrush(Color.FromArgb(180, Color.Black)))
+                {
+                    g.FillRectangle(darkenBrush, 0, 0, width, height);
+                }
+            }
+            return screenshot;
+        }
+
+
+
+
+
 
 
 
@@ -239,6 +285,11 @@ namespace MouseClickTracker
             {
                 MessageBox.Show("No heatmap to save!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void chkShowBackground_CheckedChanged(object sender, EventArgs e)
+        {
+            DrawHeatmap();
         }
 
     }

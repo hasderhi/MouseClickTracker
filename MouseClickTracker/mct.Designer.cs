@@ -35,6 +35,7 @@
             this.btnSaveHeatmap = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lblTitle = new System.Windows.Forms.Label();
+            this.chkShowBackground = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHeatmap)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -51,6 +52,7 @@
             // 
             // btnToggle
             // 
+            this.btnToggle.Font = new System.Drawing.Font("Microsoft YaHei", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnToggle.Location = new System.Drawing.Point(132, 29);
             this.btnToggle.Name = "btnToggle";
             this.btnToggle.Size = new System.Drawing.Size(165, 23);
@@ -80,6 +82,7 @@
             // 
             // btnSaveHeatmap
             // 
+            this.btnSaveHeatmap.Font = new System.Drawing.Font("Microsoft YaHei", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSaveHeatmap.Location = new System.Drawing.Point(132, 58);
             this.btnSaveHeatmap.Name = "btnSaveHeatmap";
             this.btnSaveHeatmap.Size = new System.Drawing.Size(165, 23);
@@ -90,6 +93,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.chkShowBackground);
             this.panel1.Controls.Add(this.lblTitle);
             this.panel1.Controls.Add(this.lblStatus);
             this.panel1.Controls.Add(this.btnSaveHeatmap);
@@ -109,6 +113,20 @@
             this.lblTitle.Size = new System.Drawing.Size(119, 114);
             this.lblTitle.TabIndex = 5;
             this.lblTitle.Text = "Mouse\r\nClick\r\nTracker";
+            // 
+            // chkShowBackground
+            // 
+            this.chkShowBackground.AutoSize = true;
+            this.chkShowBackground.Checked = true;
+            this.chkShowBackground.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowBackground.Font = new System.Drawing.Font("Microsoft YaHei", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkShowBackground.Location = new System.Drawing.Point(132, 87);
+            this.chkShowBackground.Name = "chkShowBackground";
+            this.chkShowBackground.Size = new System.Drawing.Size(122, 20);
+            this.chkShowBackground.TabIndex = 6;
+            this.chkShowBackground.Text = "Show Background";
+            this.chkShowBackground.UseVisualStyleBackColor = true;
+            this.chkShowBackground.CheckedChanged += new System.EventHandler(this.chkShowBackground_CheckedChanged);
             // 
             // mct
             // 
@@ -136,6 +154,7 @@
         private System.Windows.Forms.Button btnSaveHeatmap;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.CheckBox chkShowBackground;
     }
 }
 
